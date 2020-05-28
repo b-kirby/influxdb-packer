@@ -1,0 +1,30 @@
+---
+- hosts: all
+  vars: 
+    src_directory: /home/vagrant
+  tasks:
+    - name: 'Download InfluxDB 2.0'
+      get_url: 
+        url: https://dl.influxdata.com/influxdb/releases/influxdb_2.0.0-beta.10_linux_amd64.tar.gz
+        dest: "{{src_directory}}"
+    - name: 'Extract InfluxDB'
+      unarchive:
+        src: "{{src_directory}}/influxdb_2.0.0-beta.10_linux_amd64.tar.gz"
+        dest: "{{src_directory}}/influxdb_2.0.0-beta.10_linux_amd64"
+    - name: 'Copy files'
+      copy:
+        src: "{{src_directory}}/influxdb_2.0.0-beta.10_linux_amd64/influxd"
+        dest: /usr/local/bin/
+      copy:
+        src: "{{src_directory}}/influxdb_2.0.0-beta.10_linux_amd64/influx"
+        dest: /usr/local/bin/
+      copy:
+        src: "/vagrant/influxdb2.service"
+        dest:  /lib/systemd/system
+    - name: "Make sure InfluxDB User"
+      user:
+        name: influxdb
+    - name: "Make sure service is started"
+      systemd:
+        state: started
+        name: influxdb2
