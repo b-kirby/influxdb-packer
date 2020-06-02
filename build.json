@@ -1,0 +1,54 @@
+{    
+    "variables": {
+        "aws_access_key": "{{vault `/secret/data/aws` `access_key`}}",
+        "aws_secret_key": "{{vault `/secret/data/aws` `secret_key`}}",
+        "influx_version": "2"
+    },
+    "builders": [
+        {
+            "communicator": "ssh",
+            "source_path": "ubuntu/xenial64",
+            "type": "vagrant", 
+            "name":"vagrant"
+        },
+        {
+            "type": "amazon-ebs",
+            "name": "aws",
+            "access_key": "{{user `aws_access_key`}}",
+            "secret_key": "{{user `aws_secret_key`}}",
+            "region": "us-east-1",
+            "source_ami_filter": {
+                "filters": {
+                  "virtualization-type": "hvm",
+                  "name": "ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*",
+                  "root-device-type": "ebs"
+                },
+                "owners": ["099720109477"],
+                "most_recent": true
+              },
+            "instance_type": "t2.micro",
+            "ssh_username": "ubuntu",
+            "ami_block_device_mappings": [
+                {"delete_on_termination": true, 
+                "device_name": "/dev/sda1"}
+            ],
+
+            "ami_name": "InfluxDB{{user `influx_version`}} {{timestamp}}"
+          } 
+    ],
+    "provisioners":[
+        {
+            "type": "shell",
+            "inline": ["sudo apt-add-repository ppa:ansible/ansible",
+                    "sudo apt-get update",
+                    "sudo apt-get install python3 ansible -y"
+                ]
+        },
+        {
+            "type": "ansible-local",
+            "playbook_file": "./influxdb{{user `influx_version`}}/playbook.yaml",
+            "playbook_dir": "./influxdb{{user `influx_version`}}", 
+            "staging_directory": "/tmp"
+        }
+    ]
+}

@@ -1,7 +1,9 @@
 ---
 - hosts: all
+  connection: local
+  become: true
   vars: 
-    src_directory: /home/vagrant
+    src_directory: /tmp
   tasks:
     - name: 'Download InfluxDB 2.0'
       get_url: 
@@ -10,21 +12,19 @@
     - name: 'Extract InfluxDB'
       unarchive:
         src: "{{src_directory}}/influxdb_2.0.0-beta.10_linux_amd64.tar.gz"
-        dest: "{{src_directory}}/influxdb_2.0.0-beta.10_linux_amd64"
-    - name: 'Copy files'
-      copy:
-        src: "{{src_directory}}/influxdb_2.0.0-beta.10_linux_amd64/influxd"
-        dest: /usr/local/bin/
-      copy:
-        src: "{{src_directory}}/influxdb_2.0.0-beta.10_linux_amd64/influx"
-        dest: /usr/local/bin/
-      copy:
-        src: "/vagrant/influxdb2.service"
-        dest:  /lib/systemd/system
+        dest: "{{src_directory}}"
+        creates: "{{src_directory}}/influxdb_2.0.0-beta.10_linux_amd64"
     - name: "Make sure InfluxDB User"
       user:
         name: influxdb
+    - name: 'Copy files'
+      copy: src={{item.src}} dest={{item.dest}} owner=influxdb mode=0775
+      with_items:
+        - { src: "{{src_directory}}/influxdb_2.0.0-beta.10_linux_amd64/influxd", dest: /usr/local/bin/}
+        - { src: "{{src_directory}}/influxdb_2.0.0-beta.10_linux_amd64/influx", dest: /usr/local/bin/}
+        - { src: "{{src_directory}}/influxdb2.service", dest: /lib/systemd/system}
     - name: "Make sure service is started"
       systemd:
-        state: started
         name: influxdb2
+        state: started
+        enabled: yes

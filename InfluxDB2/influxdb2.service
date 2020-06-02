@@ -8,6 +8,8 @@ User=influxdb
 Group=influxdb
 ExecStart=/usr/local/bin/influxd 
 Restart=on-failure
+StartLimitIntervalSec=0
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
