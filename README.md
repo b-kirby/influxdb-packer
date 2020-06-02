@@ -1,2 +1,2 @@
-# influxdb-vagrant
- InfluxDB Instance Using Vagrant & Ansible
+# influxdb-packer
+ InfluxDB Instance Using Packer & Ansible
