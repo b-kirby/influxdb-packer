@@ -1,7 +1,7 @@
 {    
     "variables": {
-        "aws_access_key": "{{vault `/secret/data/aws` `access_key`}}",
-        "aws_secret_key": "{{vault `/secret/data/aws` `secret_key`}}",
+        "aws_access_key": "{{env `AWS_ACCESS_KEY`}}",
+        "aws_secret_key": "{{env `AWS_SECRET_KEY`}}",
         "influx_version": "2"
     },
     "builders": [
@@ -41,7 +41,7 @@
             "type": "shell",
             "inline": ["sudo apt-add-repository ppa:ansible/ansible",
                     "sudo apt-get update",
-                    "sudo apt-get install python3 ansible -y"
+                    "sudo apt-get install ansible -y"
                 ]
         },
         {

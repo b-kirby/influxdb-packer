@@ -1,0 +1,36 @@
+- name: 'Add Apt Key'
+  apt_key: 
+    url: "https://packages.grafana.com/gpg.key"
+- name: 'Add Apt Repo'  
+  apt_repository: 
+    repo: "deb https://packages.grafana.com/oss/deb stable main"
+- name: "Install Grafana Using Apt"
+  apt:
+    name: grafana
+- name: "Make Sure Dashboards Directory Exists"
+  file: 
+    path: "/var/lib/grafana/dashboards"
+    state: directory
+- name: "Download Jmeter Dashboard"
+  get_url: 
+    url: https://grafana.com/api/dashboards/5496/revisions/1/download
+    dest: "/var/lib/grafana/dashboards/jmeter.json"
+- name: "Copy Dashboard Yaml"
+  copy:
+    src: "{{src_directory}}/dashboards.yaml"
+    dest: /etc/grafana/provisioning/dashboards/
+    mode: 0775
+- name: "Make sure service is started"
+  systemd:
+    name: grafana-server
+    state: started
+    enabled: yes
+- name: Create influxdb datasource
+  grafana_datasource:
+    name: "influxdb"
+    grafana_url: "http://localhost:3000"
+    ds_type: "influxdb"
+    ds_url: "http://localhost:8086"
+    database: "datasource"
+
+  

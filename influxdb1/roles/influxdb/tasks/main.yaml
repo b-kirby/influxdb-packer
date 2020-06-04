@@ -1,0 +1,16 @@
+- name: 'Add Apt Key'
+  apt_key: 
+    url: "https://repos.influxdata.com/influxdb.key"
+- name: 'Add Apt Repo'  
+  apt_repository: 
+    repo: "deb https://repos.influxdata.com/ubuntu xenial stable"
+- name: "Install InfluxDB Using Apt"
+  apt:
+    name: influxdb
+- name: "Make sure service is started"
+  systemd:
+    name: influxdb
+    state: started
+    enabled: yes
+- name: "Make sure DB is created"
+  command: influx -execute 'CREATE DATABASE datasource'

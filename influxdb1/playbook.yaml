@@ -1,0 +1,10 @@
+---
+- hosts: all
+  connection: local
+  become: true
+  vars: 
+    src_directory: /tmp
+    ansible_python_interpreter: /usr/bin/python3
+  roles: 
+    - influxdb
+    - grafana
