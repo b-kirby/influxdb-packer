@@ -32,5 +32,9 @@
     ds_type: "influxdb"
     ds_url: "http://localhost:8086"
     database: "datasource"
+  register: result
+  until: result is not failed
+  retries: 5
+  delay: 10
 
   
