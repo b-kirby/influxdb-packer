@@ -2,7 +2,8 @@
     "variables": {
         "aws_access_key": "{{env `AWS_ACCESS_KEY`}}",
         "aws_secret_key": "{{env `AWS_SECRET_KEY`}}",
-        "influx_version": "2"
+        "influx_version": "1",
+        "gcp_project_id": ""
     },
     "builders": [
         {
@@ -34,7 +35,16 @@
             ],
 
             "ami_name": "InfluxDB{{user `influx_version`}} {{timestamp}}"
-          } 
+          }, 
+          {
+              "type": "googlecompute",
+              "name": "gcp",
+              "project_id": "{{user `gcp_project_id`}}",
+              "source_image_family": "ubuntu-1604-lts", 
+              "ssh_username": "ubuntu", 
+              "zone": "us-east1-b",
+              "image_name": "influxdb{{user `influx_version`}}--{{timestamp}}"
+          }
     ],
     "provisioners":[
         {
